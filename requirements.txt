@@ -1,6 +1,6 @@
 numpy==1.23.5
 opencv-python==4.7.0.72
-pyvirtualcam==0.10.2
+pyvirtualcam>=0.13.0    # previous 0.10.2
 pillow==9.4.0
 matplotlib==3.7.1
 numba==0.56.4
