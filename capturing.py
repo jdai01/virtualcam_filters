@@ -44,7 +44,7 @@ class VirtualCamera:
         Establishes the connection to the camera via opencv
         Source: https://github.com/letmaik/pyvirtualcam/blob/master/samples/webcam_filter.py
         '''
-        cv_vid = cv2.VideoCapture(camera_id)
+        cv_vid = cv2.VideoCapture(camera_id, cv2.CAP_DSHOW)
 
         if not cv_vid.isOpened():
             raise RuntimeError('Video-Output cannot be opened.')
