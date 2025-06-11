@@ -60,19 +60,31 @@ def plot_overlay_to_image(np_img, plt_figure):
     White pixels are ignored (transparency effect)-
     Do not change the essentials of this function to keep the performance advantages.
     '''
-    
+    # Fix np_img shape if needed
+    if np_img.ndim == 4 and np_img.shape[2] == 3 and np_img.shape[3] == 3:
+        np_img = np_img[:, :, :, 0]
+
     rgba_buf = plt_figure.canvas.buffer_rgba()
     (w, h) = plt_figure.canvas.get_width_height()
     imga = np.frombuffer(rgba_buf, dtype=np.uint8).reshape(h,w,4)[:,:,:3]
     
     # ignore white pixels
-    plt_indices = np.argwhere(imga < 255)
+    plt_indices = np.any(imga < 255, axis=2)
 
     # add only non-white values
-    height_indices = plt_indices[:,0]
-    width_indices = plt_indices[:,1]
-    
-    np_img[height_indices, width_indices] = imga[height_indices, width_indices]
+    height_indices, width_indices = np.nonzero(plt_indices)
+
+    # print("np_img shape:", np_img.shape)
+    # print("imga shape:", imga.shape)
+    # print("height_indices shape:", height_indices.shape)
+    # print("width_indices shape:", width_indices.shape)
+    # print("np_img[height_indices, width_indices].shape:", np_img[height_indices, width_indices].shape)
+    # print("np_img[height_indices, width_indices, :].shape:", np_img[height_indices, width_indices, :].shape)
+    # print("imga[height_indices, width_indices].shape:", imga[height_indices, width_indices].shape)
+    # print("imga[height_indices, width_indices, :].shape:", imga[height_indices, width_indices, :].shape)
+
+
+    np_img[height_indices, width_indices, :] = imga[height_indices, width_indices, :]
 
     return np_img
 

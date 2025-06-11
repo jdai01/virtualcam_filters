@@ -6,6 +6,7 @@ import os
 from capturing import VirtualCamera
 from overlays import initialize_hist_figure, plot_overlay_to_image, plot_strings_to_image, update_histogram
 from basics import *
+from special import *
 
 def custom_processing(img_source_generator, processing_function):
     # Initialize histogram figure and plotting objects
@@ -50,12 +51,13 @@ def custom_processing(img_source_generator, processing_function):
 
 def main():
     # change according to your settings
-    width = 1280
-    height = 720
-    fps = 30
-    
-    # Define your virtual camera
+    width, height, fps = 1280, 720, 30
     vc = VirtualCamera(fps, width, height)
+
+    # Initialize face detector and load emoji globally once
+    global face_cascade, cat_emoji
+    face_cascade = cv2.CascadeClassifier(cv2.data.haarcascades + "haarcascade_frontalface_default.xml")
+    cat_emoji = cv2.imread('cat_emoji.png', cv2.IMREAD_UNCHANGED)
     
     vc.virtual_cam_interaction(
         custom_processing(
@@ -66,7 +68,12 @@ def main():
             # vc.capture_screen(),
 
             # Processing function
+            # processing_function=identity_filter_numba
+            # processing_function=blur_filter_numba
+            # processing_function=sharpen_filter_numba
+            # processing_function=gabor_filter_numba
             processing_function=sobel_filter_numba
+            # processing_function=processing_with_cat_overlay
         ), 
         preview=True
     )
