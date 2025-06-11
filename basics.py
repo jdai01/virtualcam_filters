@@ -158,6 +158,7 @@ Filters:
 """
 @njit
 def identity_filter_numba(np_img):
+    """Identity filter"""
     height, width, channels = np_img.shape
     out = np.zeros((height, width, channels), dtype=np.uint8)
     for i in range(height):
@@ -168,6 +169,7 @@ def identity_filter_numba(np_img):
 
 @njit
 def blur_filter_numba(np_img, kernel_size=5):
+    """Blur filter"""
     height, width, channels = np_img.shape
     pad = kernel_size // 2
     out = np.zeros_like(np_img)
@@ -184,6 +186,7 @@ def blur_filter_numba(np_img, kernel_size=5):
 
 @njit
 def sharpen_filter_numba(np_img):
+    """Sharpen filter"""
     kernel = np.array([[0, -1, 0],
                        [-1, 5, -1],
                        [0, -1, 0]], dtype=np.int32)
@@ -206,6 +209,7 @@ def sharpen_filter_numba(np_img):
 
 @njit
 def gabor_filter_numba(np_img, ksize=7, sigma=2.0, theta=0.0, lambd=10.0, gamma=0.5, psi=0.0):
+    """Gabor filter"""
     height, width, channels = np_img.shape
     half = ksize // 2
     out = np.zeros_like(np_img)
@@ -254,6 +258,7 @@ def gabor_filter_numba(np_img, ksize=7, sigma=2.0, theta=0.0, lambd=10.0, gamma=
 
 @njit
 def sobel_filter_numba(np_img):
+    """Sobel filter"""
     # Simple edge detection using Sobel filter on grayscale (convert RGB to grayscale first)
     height, width = np_img.shape[0], np_img.shape[1]
     out = np.zeros((height, width), dtype=np.uint8)
