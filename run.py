@@ -30,7 +30,7 @@ def custom_processing(img_source_generator, processing_function):
         processed_output_colored = plot_overlay_to_image(processed_output_colored, fig)
         
         # Add annotation text to the image
-        annotation_lines = ["Processed Output", "Press 'h' to print"]
+        annotation_lines = [f"Processed with {processing_function.__doc__}", "Press 'h' to save image."]
         processed_output_colored = plot_strings_to_image(processed_output_colored, annotation_lines)
         
         # Handle key press interaction
@@ -53,11 +53,6 @@ def main():
     # change according to your settings
     width, height, fps = 1280, 720, 30
     vc = VirtualCamera(fps, width, height)
-
-    # Initialize face detector and load emoji globally once
-    global face_cascade, cat_emoji
-    face_cascade = cv2.CascadeClassifier(cv2.data.haarcascades + "haarcascade_frontalface_default.xml")
-    cat_emoji = cv2.imread('cat_emoji.png', cv2.IMREAD_UNCHANGED)
     
     vc.virtual_cam_interaction(
         custom_processing(
@@ -72,8 +67,8 @@ def main():
             # processing_function=blur_filter_numba
             # processing_function=sharpen_filter_numba
             # processing_function=gabor_filter_numba
-            processing_function=sobel_filter_numba
-            # processing_function=processing_with_cat_overlay
+            # processing_function=sobel_filter_numba
+            processing_function=processing_with_cat_overlay
         ), 
         preview=True
     )
