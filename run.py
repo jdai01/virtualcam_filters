@@ -5,9 +5,9 @@ import time
 import os
 from capturing import VirtualCamera
 from overlays import initialize_hist_figure, plot_overlay_to_image, plot_strings_to_image, update_histogram
-from basics import histogram_figure_numba, sobel_filter_numba
+from basics import *
 
-def custom_processing(img_source_generator, processing_function=sobel_filter_numba):
+def custom_processing(img_source_generator, processing_function):
     # Initialize histogram figure and plotting objects
     fig, ax, background, plot_r, plot_g, plot_b = initialize_hist_figure()
     
