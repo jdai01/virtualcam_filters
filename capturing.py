@@ -24,7 +24,6 @@ class VirtualCamera:
         Represents the content of the primary monitor.
         Can be used to quickly test your application.
         '''
-        
         width = alt_width if alt_width > 0 else self.width
         height = alt_height if alt_height > 0 else self.height
         while True:
@@ -75,15 +74,19 @@ class VirtualCamera:
             yield frame
 
     
-    def virtual_cam_interaction(self, img_generator, print_fps=True):
+    def virtual_cam_interaction(self, img_generator, print_fps=True, preview=True):
         '''
-        Provides a virtual camera.
+        Provides a virtual camera and optionally shows the video in a popup window using OpenCV.
         img_generator must represent a function that acts as a generator and returns image data.
         '''
         print('Quit camera stream with "q"')
         with pyvirtualcam.Camera(width=self.width, height=self.height, fps=self.fps, print_fps=print_fps) as cam:
             for img in img_generator:
-                # provide the image
-                cam.send(img)
-                # wait for next frame (fps dependent)
-                cam.sleep_until_next_frame()
+                cam.send(img) # provide the image
+                cam.sleep_until_next_frame() # wait for next frame (fps dependent)
+
+                if preview:
+                    cv2.imshow('Virtual Camera Preview', img[..., ::-1])  # Convert RGB back to BGR for display
+                    if cv2.waitKey(1) & 0xFF == ord('q'):
+                        break
+        cv2.destroyAllWindows()

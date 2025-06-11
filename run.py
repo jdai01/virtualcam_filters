@@ -76,7 +76,8 @@ def main():
             
             # or your window screen
             # vc.capture_screen()
-        )
+        ), 
+        preview=True
     )
 
 if __name__ == "__main__":
