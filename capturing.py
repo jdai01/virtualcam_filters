@@ -76,17 +76,33 @@ class VirtualCamera:
     
     def virtual_cam_interaction(self, img_generator, print_fps=True, preview=True):
         '''
-        Provides a virtual camera and optionally shows the video in a popup window using OpenCV.
+        Provides a virtual camera and optionally shows both original and processed video in a single OpenCV popup window.
         img_generator must represent a function that acts as a generator and returns image data.
         '''
         print('Quit camera stream with "q"')
         with pyvirtualcam.Camera(width=self.width, height=self.height, fps=self.fps, print_fps=print_fps) as cam:
-            for img in img_generator:
-                cam.send(img) # provide the image
+            if preview:
+                window_name = 'Original (Top) | Processed (Bottom)'
+                cv2.namedWindow(window_name, cv2.WINDOW_NORMAL)
+                cv2.resizeWindow(window_name, int(self.width/2), self.height)  # width x height
+
+            
+            for orig_img, proc_img in img_generator:
+                cam.send(proc_img) # provide the image
                 cam.sleep_until_next_frame() # wait for next frame (fps dependent)
 
                 if preview:
-                    cv2.imshow('Virtual Camera Preview', img[..., ::-1])  # Convert RGB back to BGR for display
+                    # Convert both images from RGB to BGR for OpenCV display
+                    orig_bgr = orig_img[..., ::-1]
+                    proc_bgr = proc_img[..., ::-1]
+                    
+                    # Concatenate horizontally
+                    combined = np.vstack((orig_bgr, proc_bgr))
+                    
+                    # Show in one window
+                    cv2.imshow(window_name, combined)
                     if cv2.waitKey(1) & 0xFF == ord('q'):
                         break
-        cv2.destroyAllWindows()
+        
+            if preview:
+                cv2.destroyAllWindows()

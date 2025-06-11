@@ -1,62 +1,50 @@
-# -*- coding: utf-8 -*-
-"""
-Created on Thu Apr 22 11:59:19 2021
-
-@author: droes
-"""
-# You can use this library for oberserving keyboard presses
-import keyboard # pip install keyboard
-
+import keyboard
+import numpy as np
+import cv2
+import time
+import os
 from capturing import VirtualCamera
 from overlays import initialize_hist_figure, plot_overlay_to_image, plot_strings_to_image, update_histogram
-from basics import histogram_figure_numba
+from basics import histogram_figure_numba, sobel_filter_numba
 
-
-# Example function
-# You can use this function to process the images from opencv
-# This function must be implemented as a generator function
-def custom_processing(img_source_generator):
-    # use this figure to plot your histogram
-    fig, ax, background, r_plot, g_plot, b_plot = initialize_hist_figure()
+def custom_processing(img_source_generator, processing_function=sobel_filter_numba):
+    # Initialize histogram figure and plotting objects
+    fig, ax, background, plot_r, plot_g, plot_b = initialize_hist_figure()
     
-    for sequence in img_source_generator:
-        # Call your custom processing methods here! (e. g. filters)
+    for input_data in img_source_generator:
+        # Apply processing function (e.g., edge detection)
+        processed_output = processing_function(input_data.copy())
+         
+        # Convert single-channel (e.g., grayscale) to 3-channel format
+        processed_output_colored = np.stack((processed_output,) * 3, axis=-1)
         
+        # Generate color histograms from original input
+        hist_r, hist_g, hist_b = histogram_figure_numba(input_data)
+        update_histogram(
+            fig, ax, background,
+            plot_r, plot_g, plot_b, hist_r, hist_g, hist_b
+        )
         
+        # Overlay the visualization on the processed image
+        processed_output_colored = plot_overlay_to_image(processed_output_colored, fig)
+        
+        # Add annotation text to the image
+        annotation_lines = ["Processed Output", "Press 'h' to print"]
+        processed_output_colored = plot_strings_to_image(processed_output_colored, annotation_lines)
+        
+        # Handle key press interaction
+        if keyboard.is_pressed('h'):
+            # Ensure 'img' directory exists
+            folder = 'img'
+            os.makedirs(folder, exist_ok=True)
 
-        # Example of keyboard is pressed
-        # If you want to use this method then consider implementing a counter
-        # that ignores for example the next five keyboard press events to
-        # "prevent" double clicks due to high fps rates
-        if keyboard.is_pressed('h') :
-            print('h pressed')
-            
-
-        ###
-        ### Histogram overlay example (without data)
-        ###
+            # Create a unique filename using timestamp
+            filename = f"{folder}/output_{int(time.time())}.png"
+            cv2.imwrite(filename, processed_output_colored)
+            print(f"Image saved as {filename}")
         
-        # Load the histogram values
-        r_bars, g_bars, b_bars = histogram_figure_numba(sequence)        
-        
-        # Update the histogram with new data
-        update_histogram(fig, ax, background, r_plot, g_plot, b_plot, r_bars, g_bars, b_bars)
-        
-        # uses the figure to create the overlay
-        sequence = plot_overlay_to_image(sequence, fig)
-        
-        ###
-        ### END Histogram overlay example
-        ###
-
-        
-        # Display text example
-        display_text_arr = ["Test", "abc"]
-        sequence = plot_strings_to_image(sequence, display_text_arr)
-
-        
-        # Make sure to yield your processed image
-        yield sequence
+        # Yield original and processed images
+        yield input_data, processed_output_colored
 
 
 
@@ -72,10 +60,13 @@ def main():
     vc.virtual_cam_interaction(
         custom_processing(
             # either camera stream
-            vc.capture_cv_video(0, bgr_to_rgb=True)
+            vc.capture_cv_video(0, bgr_to_rgb=True),
             
             # or your window screen
-            # vc.capture_screen()
+            # vc.capture_screen(),
+
+            # Processing function
+            processing_function=sobel_filter_numba
         ), 
         preview=True
     )
