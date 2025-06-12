@@ -30,4 +30,5 @@ python run.py
 ```
 
 #### Note:
-`pyvirtualcam` currently does not support macOS 14 Ventura ([Source](https://github.com/letmaik/pyvirtualcam/issues/111))
+- This project was tested with **Python 3.10**.
+- `pyvirtualcam` currently does not support macOS 14 Ventura ([Source](https://github.com/letmaik/pyvirtualcam/issues/111))

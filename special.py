@@ -7,7 +7,7 @@ from basics import *
 face_cascade = cv2.CascadeClassifier(cv2.data.haarcascades + "haarcascade_frontalface_default.xml")
 
 # Load image
-image_path = 'troll-face-90.png'
+image_path = 'cat_emoji.png'
 overlay_img = cv2.imread(os.path.join('img', image_path), cv2.IMREAD_UNCHANGED)
 if overlay_img is None:
     raise FileNotFoundError(f"Could not load '{image_path}'. Please check the path and file integrity.")
